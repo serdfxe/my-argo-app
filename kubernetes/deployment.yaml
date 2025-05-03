@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: fastapi-app
-        image: serdfx/fastapi-k8s-demo-app:latest
+        image: ghcr.io/${{ github.repository_owner }}/fastapi-k8s-demo-app:${{ github.sha }}
         ports:
         - containerPort: 8000
         livenessProbe:

@@ -5,7 +5,7 @@ on:
     branches: [ main, master ]
 
 env:
-  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-k8s-demo-app
+  DOCKER_IMAGE: ghcr.io/${{ github.repository_owner }}/fastapi-k8s-demo-app
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
 
 jobs:
@@ -15,11 +15,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     
-    - name: Login to Docker Hub
+    - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build and push Docker image
       run: |
@@ -37,5 +38,6 @@ jobs:
 
     - name: Deploy to Kubernetes
       run: |
+        sed -i "s|image: .*|image: $DOCKER_IMAGE:${{ github.sha }}|" kubernetes/deployment.yaml
         kubectl apply -f kubernetes/deployment.yaml
         kubectl apply -f kubernetes/service.yaml
