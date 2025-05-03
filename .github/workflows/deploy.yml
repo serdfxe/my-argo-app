@@ -25,11 +25,9 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build and push Docker image
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        push: true
-        tags: ${{ env.DOCKER_IMAGE }}:latest
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-k8s-app:${{ github.sha }} -f app/Dockerfile .
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-k8s-app:${{ github.sha }}
 
     - name: Install kubectl
       uses: azure/setup-kubectl@v1
