@@ -1,10 +1,6 @@
 name: Build and Push Demo App
 
-on:
-  push:
-    branches: [ main ]
-    paths: 
-      - 'apps/demo-app/**'
+on: [ push ]
 
 jobs:
   build:
