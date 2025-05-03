@@ -19,10 +19,3 @@ jobs:
         ls 
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/demo-app:${{ github.sha }} -f apps/demo-app/Dockerfile .
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/demo-app:${{ github.sha }}
-        
-    - name: Update k8s manifest
-      run: |
-        sed -i "s|image:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/demo-app:${{ github.sha }}|" apps/demo-app/k8s/deployment.yaml
-        git config --global user.name "CI/CD Bot"
-        git commit -am "Update demo-app image to ${{ github.sha }}"
-        git push
