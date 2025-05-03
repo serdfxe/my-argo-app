@@ -1,17 +1,13 @@
-# Используем официальный образ Python
 FROM python:3.9-slim
 
-# Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем зависимости
-COPY src/requirements.txt .
-
-# Устанавливаем зависимости
+# Копируем зависимости и устанавливаем их
+COPY ./src/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Копируем исходный код
-COPY src/ .
+COPY ./src/ .
 
 # Запускаем приложение
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
