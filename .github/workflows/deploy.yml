@@ -11,9 +11,13 @@ env:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
@@ -24,11 +28,12 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        docker build -t $DOCKER_IMAGE:${{ github.sha }} -f Dockerfile .
+        docker build -t $DOCKER_IMAGE:${{ github.sha }} -t $DOCKER_IMAGE:latest -f Dockerfile .
         docker push $DOCKER_IMAGE:${{ github.sha }}
+        docker push $DOCKER_IMAGE:latest
 
     - name: Install kubectl
-      uses: azure/setup-kubectl@v1
+      uses: azure/setup-kubectl@v3
       
     - name: Configure Kubernetes
       run: |
@@ -36,8 +41,11 @@ jobs:
         echo "$KUBE_CONFIG" > ~/.kube/config
         kubectl version --client
 
-    - name: Deploy to Kubernetes
+    - name: Update deployment manifest
       run: |
         sed -i "s|image: .*|image: $DOCKER_IMAGE:${{ github.sha }}|" kubernetes/deployment.yaml
+
+    - name: Deploy to Kubernetes
+      run: |
         kubectl apply -f kubernetes/deployment.yaml
         kubectl apply -f kubernetes/service.yaml

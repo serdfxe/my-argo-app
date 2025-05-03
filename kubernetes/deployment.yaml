@@ -12,9 +12,11 @@ spec:
       labels:
         app: fastapi-app
     spec:
+      imagePullSecrets:
+      - name: ghcr-secret
       containers:
       - name: fastapi-app
-        image: ghcr.io/${{ github.repository_owner }}/fastapi-k8s-demo-app:${{ github.sha }}
+        image: IMAGE_PLACEHOLDER  # This will be replaced by the workflow
         ports:
         - containerPort: 8000
         livenessProbe:
