@@ -2,35 +2,54 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: demo-app
+  labels:
+    app: demo-app
+    component: backend
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: demo-app
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
   template:
     metadata:
       labels:
         app: demo-app
+        env: production
       annotations:
         prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
     spec:
       containers:
       - name: demo-app
-        image: demo-app:latest
+        image: {{ .Values.image.repository | default "serdfx" }}/demo-app:{{ .Values.image.tag | default "latest" }}  # Параметры для Helm
         ports:
         - containerPort: 8000
+          name: http
         env:
         - name: ENVIRONMENT
-          value: "dev"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: demo-app
-spec:
-  selector:
-    app: demo-app
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8000
+          value: "production"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      restartPolicy: Always
