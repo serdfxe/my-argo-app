@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: fastapi-app
-        image: serdfx/fastapi-k8s-app:latest
+        image: serdfx/fastapi-k8s-demo-app:latest
         ports:
         - containerPort: 8000
         livenessProbe:

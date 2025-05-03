@@ -5,7 +5,7 @@ on:
     branches: [ main, master ]
 
 env:
-  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-k8s-app
+  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-k8s-demo-app
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
 
 jobs:
@@ -23,8 +23,8 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-k8s-app -f Dockerfile .
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-k8s-app
+        docker build -t $DOCKER_IMAGE:${{ github.sha }} -f Dockerfile .
+        docker push $DOCKER_IMAGE:${{ github.sha }}
 
     - name: Install kubectl
       uses: azure/setup-kubectl@v1
