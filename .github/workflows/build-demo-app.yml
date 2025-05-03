@@ -1,0 +1,25 @@
+name: Build and Push Demo App
+
+on:
+  push:
+    branches: [ main ]
+    paths: 
+      - 'apps/demo-app/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Docker image
+      run: |
+        docker build -t demo-app:${{ github.sha }} -f apps/demo-app/Dockerfile .
+        docker push demo-app:${{ github.sha }}
+        
+    - name: Update k8s manifest
+      run: |
+        sed -i "s|image:.*|image: demo-app:${{ github.sha }}|" apps/demo-app/k8s/deployment.yaml
+        git config --global user.name "CI/CD Bot"
+        git commit -am "Update demo-app image to ${{ github.sha }}"
+        git push
