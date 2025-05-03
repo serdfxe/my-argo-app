@@ -26,7 +26,7 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-k8s-app:${{ github.sha }} -f app/Dockerfile .
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-k8s-app:${{ github.sha }} -f Dockerfile .
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-k8s-app:${{ github.sha }}
 
     - name: Install kubectl
