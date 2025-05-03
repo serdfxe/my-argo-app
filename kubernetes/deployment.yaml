@@ -15,7 +15,6 @@ spec:
       containers:
       - name: fastapi-app
         image: serdfx/fastapi-k8s-demo-app:latest
-        imagePullPolicy: Never
         ports:
         - containerPort: 8000
         livenessProbe:
@@ -24,5 +23,3 @@ spec:
             port: 8000
           initialDelaySeconds: 5
           periodSeconds: 10
-      imagePullSecrets:
-      - name: regcred 
