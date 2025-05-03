@@ -10,6 +10,7 @@ jobs:
     
     - name: Build Docker image
       run: |
+        ls 
         docker build -t demo-app:${{ github.sha }} -f apps/demo-app/Dockerfile .
         docker push demo-app:${{ github.sha }}
         
