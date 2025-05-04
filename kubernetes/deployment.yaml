@@ -16,7 +16,7 @@ spec:
       - name: ghcr-secret
       containers:
       - name: fastapi-app
-        image: IMAGE_PLACEHOLDER
+        image: ghcr.io/serdfxe/fastapi-k8s-demo-app:2bd9fcbe56efba516ee887cc5dbf4e4a0dfd2713
         ports:
         - containerPort: 8000
         livenessProbe:
