@@ -1,4 +1,4 @@
-name: Deploy to Kubernetes
+name: Build and Push
 
 on:
   push:
@@ -6,10 +6,9 @@ on:
 
 env:
   DOCKER_IMAGE: ghcr.io/${{ github.repository_owner }}/fastapi-k8s-demo-app
-  KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -32,20 +31,11 @@ jobs:
         docker push $DOCKER_IMAGE:${{ github.sha }}
         docker push $DOCKER_IMAGE:latest
 
-    - name: Install kubectl
-      uses: azure/setup-kubectl@v3
-      
-    - name: Configure Kubernetes
-      run: |
-        mkdir -p ~/.kube
-        echo "$KUBE_CONFIG" > ~/.kube/config
-        kubectl version --client
-
     - name: Update deployment manifest
       run: |
         sed -i "s|image: .*|image: $DOCKER_IMAGE:${{ github.sha }}|" kubernetes/deployment.yaml
-
-    - name: Deploy to Kubernetes
-      run: |
-        kubectl apply -f kubernetes/deployment.yaml
-        kubectl apply -f kubernetes/service.yaml
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git add kubernetes/deployment.yaml
+        git commit -m "Update image to $DOCKER_IMAGE:${{ github.sha }}"
+        git push
